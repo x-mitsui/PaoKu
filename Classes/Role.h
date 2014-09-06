@@ -5,6 +5,13 @@
 
 #define ROLE_ZORDER 10
 
+enum class ROLE_STATE{
+	ROLE_INVALID_STATE = 0,
+	ROLE_RUN_STATE,
+	ROLE_JUMP_UP_STATE,
+	ROLE_JUMP_DOWN_STATE,
+	ROLE_STAND_BY
+};
 class Role :public cocos2d::Node
 {
 public:
@@ -16,8 +23,23 @@ public:
 
 	CC_SYNTHESIZE(cocos2d::TMXTiledMap*, gameMap ,GameMap);
 	CC_PROPERTY(cocos2d::Vec2, currentRolePoint, CurrentRolePoint);
+	CC_SYNTHESIZE(ROLE_STATE, currentRoleState,CurrentRoleState);
+	CC_SYNTHESIZE(float, xSpeed, Xspeed);
+	CC_SYNTHESIZE(float, ySpeed, Yspeed);
+	CC_SYNTHESIZE(float, constxSpeed, ConstXspeed);//为了恢复原速度而用
+	CC_SYNTHESIZE(float, constySpeed, ConstYspeed);
+	void role_update(float dt);
+	void role_logic();
+private:
+	void runLogic();
+	void jumpUpLogic();
+	void jumpDownLogic();
 private:
 	cocos2d::Sprite *mSprite;
+private:
+	//根据人物的位置点设置镜头
+	void setMapPointByRole();
+	void camera_update(float delta);
 };
 
 
