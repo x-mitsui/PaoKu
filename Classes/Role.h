@@ -59,6 +59,9 @@ private:
 	bool isCollisionWithTop(cocos2d::Rect Box);
 	bool isCollisionWithBottom(cocos2d::Rect Box);
 
+	void fixColl(COLL_STATE collState ,cocos2d::Rect);
+private:
+	float acceleration;
 };
 
 

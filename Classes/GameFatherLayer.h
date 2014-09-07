@@ -4,7 +4,7 @@
 #include "cocos2d.h"
 #include "Role.h"
 
-
+#define mROLE_TAG 2
 class GameFatherLayer : cocos2d::Layer
 {
 public:
@@ -24,6 +24,17 @@ public:
 	void menuCloseCallback(cocos2d::Ref* pSender);
 
 	CREATE_FUNC(GameFatherLayer);
+
+	//-->´¥Ãþ
+	bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *unused_event);
+	void onTouchMoved(cocos2d::Touch *touch, cocos2d::Event *unused_event);
+	void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event*unused_event);
+
+	virtual void onEnter()override;
+	virtual void onExit()override;
+
+	void WhenRunTurnJump();
+	//<--
 private:
 	cocos2d::TMXTiledMap* m_TileMap;
 	Role* mRole;

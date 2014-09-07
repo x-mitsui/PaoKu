@@ -2,7 +2,7 @@
 #include "Dlog.h"
 USING_NS_CC;
 
-Role::Role():xSpeed(5),ySpeed(15),constxSpeed(xSpeed),constySpeed(ySpeed)
+Role::Role():xSpeed(5),ySpeed(10),constxSpeed(xSpeed),constySpeed(ySpeed),acceleration(0.94f)
 {
 }
 
@@ -17,7 +17,7 @@ bool Role::init()
 
 void Role::extraInit()
 {
-	mSprite = Sprite::create("CloseNormal.png");
+	mSprite = Sprite::create("icon.png");
 	auto objectGroup = getGameMap()->getObjectGroup("Role");//找对象组
 	ValueMap dict = objectGroup->getObject("player");//对象组中的对象
 
@@ -111,12 +111,60 @@ void Role::runLogic()
 
 void Role::jumpUpLogic()
 {
+	//模拟向上跳跃过程
+	if (ySpeed<=0)
+	{
+		ySpeed = 0;
+	}
 
+	if (ySpeed == 0)
+	{
+		//转为下落状态
+		this->setCurrentRoleState(ROLE_STATE::ROLE_JUMP_DOWN_STATE);
+		Dlog::showLog("人物转为下落状态");
+		return;
+	}
+
+	Vec2 roleCurrentPoint = getCurrentRolePoint();
+
+	float xValue = roleCurrentPoint.x + xSpeed;
+	ySpeed -= acceleration;
+
+	float yValue = roleCurrentPoint.y + ySpeed;
+
+	this->setCurrentRolePoint(Vec2(xValue ,yValue));
 }
 
 void Role::jumpDownLogic()
 {
+	/*
+		1.判断与地面（Y方向）的碰撞顺序
+		2.判断与（X方向）
+	*/
 
+	if(isCollWithCollArea(COLL_STATE::COLL_BOTTOM))
+	{
+		ySpeed = constySpeed;
+
+		setCurrentRoleState(ROLE_STATE::ROLE_RUN_STATE);
+
+		return;
+	}
+
+	Vec2 roleCurrentPoint = getCurrentRolePoint();
+
+	ySpeed += acceleration;
+
+
+	if (ySpeed >= 15)
+	{
+		ySpeed = 15;
+	}
+
+	Vec2 rlt = Vec2(xSpeed,-ySpeed);
+	Vec2 curPos = roleCurrentPoint + rlt;
+
+	this->setCurrentRolePoint(curPos);
 }
 
 
@@ -214,6 +262,12 @@ bool Role::isCollWithCollArea(COLL_STATE collState)
 		default:
 			break;
 		}
+		if (Flag)
+		{
+			//只有已经碰撞了，才进行碰撞修复
+			Dlog::showLog("fixing");
+			fixColl(collState,box);
+		}
 	}
 	
 	return Flag;
@@ -245,6 +299,53 @@ bool Role::isCollisionWithTop(Rect Box)
 bool Role::isCollisionWithBottom(Rect Box)
 {
 	auto roleBox = mSprite->getBoundingBox();
-	auto rolePoint = Vec2(roleBox.getMidX(),roleBox.getMidY());
+	auto rolePoint = Vec2(roleBox.getMinX(),roleBox.getMinY());
 	return Box.containsPoint(rolePoint);
+}
+
+/*
+	修复碰撞
+*/
+void Role::fixColl(COLL_STATE collState ,Rect box)
+{
+	/*
+		1.算出相交的矩形
+		2.根据方向将人物拉回到应有的位置上
+	*/
+
+	Rect roleBox = mSprite->getBoundingBox();
+
+	float maxX = roleBox.getMaxX() > box.getMaxX()?box.getMaxX():roleBox.getMaxX();
+	float minX = roleBox.getMinX() > box.getMinX()?roleBox.getMinX():box.getMinX();
+	float maxY = roleBox.getMaxY() > box.getMaxY()?box.getMaxY():roleBox.getMaxY();
+	float minY = roleBox.getMinY() > box.getMinY()?roleBox.getMinY():box.getMinY();
+
+	float width = maxX - minX;
+	float height = maxY - minY;
+
+	Rect inBox = Rect(minX,maxY,width,height);
+
+	if (collState == COLL_STATE::COLL_BOTTOM)
+	{
+		mSprite->setPositionY(mSprite->getPositionY()+height);
+		return;
+	}
+
+	if (collState == COLL_STATE::COLL_TOP)
+	{
+		mSprite->setPositionY(mSprite->getPositionY()-height);
+		return;
+	}
+
+	if (collState == COLL_STATE::COLL_LEFT)
+	{
+		mSprite->setPositionX(mSprite->getPositionX()+width);
+		return;
+	}
+
+	if (collState == COLL_STATE::COLL_RIGHT)
+	{
+		mSprite->setPositionX(mSprite->getPositionX()-width);
+		return;
+	}
 }

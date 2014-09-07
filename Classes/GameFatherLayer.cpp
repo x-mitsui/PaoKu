@@ -1,5 +1,5 @@
 #include "GameFatherLayer.h"
-
+#include "Dlog.h"
 USING_NS_CC;
 
 GameFatherLayer::GameFatherLayer()
@@ -35,6 +35,7 @@ bool GameFatherLayer::init()
 		return false;
 	}
 
+
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -66,10 +67,64 @@ void GameFatherLayer::initRole()
 
 	mRole = Role::createWithTMX(m_TileMap);
 	
-	addChild(mRole,2);
+	addChild(mRole,2,mROLE_TAG);
 }
 
 void GameFatherLayer::menuCloseCallback(Ref* pSender)
 {
 
+}
+
+void GameFatherLayer::onEnter()
+{
+	Layer::onEnter();
+	auto listener=EventListenerTouchOneByOne::create();
+	listener->setSwallowTouches(true);
+	listener->onTouchBegan=CC_CALLBACK_2(GameFatherLayer::onTouchBegan,this);
+	listener->onTouchMoved=CC_CALLBACK_2(GameFatherLayer::onTouchMoved,this);
+	listener->onTouchEnded=CC_CALLBACK_2(GameFatherLayer::onTouchEnded,this);
+
+	auto eventdispatcher=Director::getInstance()->getEventDispatcher();
+	eventdispatcher->addEventListenerWithSceneGraphPriority(listener,getChildByTag(mROLE_TAG));
+
+}
+
+void GameFatherLayer::onExit()
+{
+	Layer::onExit();
+	auto eventdispatcher=Director::getInstance()->getEventDispatcher();
+	eventdispatcher->removeAllEventListeners();
+}
+
+bool GameFatherLayer::onTouchBegan(Touch *touch, Event *unused_event)
+{
+	Dlog::showLog("onTouchBegan");
+	WhenRunTurnJump();
+	return true;
+}
+
+void GameFatherLayer::onTouchMoved(Touch *touch, Event *unused_event)
+{
+	Dlog::showLog("onTouchMoved");
+
+}
+
+void GameFatherLayer::onTouchEnded(Touch *touch, Event*unused_event)
+{
+	Dlog::showLog("onTouchEnded");
+
+}
+
+void GameFatherLayer::WhenRunTurnJump()
+{
+	if(mRole->getCurrentRoleState()==ROLE_STATE::ROLE_RUN_STATE)
+	{
+		Dlog::showLog("jump up");
+		mRole->setCurrentRoleState(ROLE_STATE::ROLE_JUMP_UP_STATE);
+	}
+	else
+	{
+		Dlog::showLog("Not running");
+		return;
+	}
 }
