@@ -2,7 +2,7 @@
 #include "Dlog.h"
 USING_NS_CC;
 
-Role::Role():xSpeed(5),ySpeed(10),constxSpeed(xSpeed),constySpeed(ySpeed),acceleration(0.94f)
+Role::Role():xSpeed(5),ySpeed(15),constxSpeed(xSpeed),constySpeed(ySpeed),acceleration(0.94f)
 {
 }
 
@@ -232,7 +232,7 @@ bool Role::isCollWithCollArea(COLL_STATE collState)
 	bool Flag = false;
 
 	auto collGroup = getGameMap()->getObjectGroup("coll");
-	for (auto obj : collGroup->getObjects())
+	for (auto &obj : collGroup->getObjects())
 	{
 		auto dict =  obj.asValueMap();//不要用“强制转换”来转换，要用这种形式转换
 		float x = dict["x"].asFloat();

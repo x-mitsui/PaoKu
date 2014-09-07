@@ -21,6 +21,7 @@ public:
 	void initMap();
 	void initRole();
 
+	void initComponents();
 	void menuCloseCallback(cocos2d::Ref* pSender);
 
 	CREATE_FUNC(GameFatherLayer);

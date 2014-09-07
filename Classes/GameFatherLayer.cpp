@@ -40,10 +40,14 @@ bool GameFatherLayer::init()
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	initMap();
+
+
 	
 	initUI();
 	
 	initRole();
+
+	
 	return true;
 }
 
@@ -60,6 +64,8 @@ void GameFatherLayer::initMap()
 	m_TileMap = TMXTiledMap::create("maps/PaoKu_Background2.tmx");
 
 	this->addChild(m_TileMap,1);
+
+	initComponents();
 }
 
 void GameFatherLayer::initRole()
@@ -68,6 +74,21 @@ void GameFatherLayer::initRole()
 	mRole = Role::createWithTMX(m_TileMap);
 	
 	addChild(mRole,2,mROLE_TAG);
+}
+
+void GameFatherLayer::initComponents()
+{
+	auto goldGroup = m_TileMap->getObjectGroup("items");
+	for (auto &obj : goldGroup->getObjects())
+	{
+		auto dict =  obj.asValueMap();//不要用“强制转换”来转换，要用这种形式转换
+		float x = dict["x"].asFloat();
+		float y = dict["y"].asFloat();
+		auto gold = Sprite::create("images/gold.png");
+		gold->setPosition(x,y);
+		m_TileMap->addChild(gold,1000);//此处添加到地图中
+	}
+
 }
 
 void GameFatherLayer::menuCloseCallback(Ref* pSender)
