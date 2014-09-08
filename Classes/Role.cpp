@@ -4,6 +4,7 @@ USING_NS_CC;
 
 Role::Role():xSpeed(5),ySpeed(15),constxSpeed(xSpeed),constySpeed(ySpeed),acceleration(0.94f)
 {
+
 }
 
 Role::~Role()
@@ -191,6 +192,36 @@ void Role::role_logic()
 	default:
 		
 		break;
+	}
+}
+
+void Role::onEnter()
+{
+	Node::onEnter();
+	this->schedule(schedule_selector(Role::collsitionWithGold),0.016f);
+}
+
+void Role::collsitionWithGold(float delta)
+{
+	for (unsigned i = 0;i<goldVector.size();i++)   //这里技巧性的没用迭代器，而用普通遍历
+	{
+		goldStruct gs = goldVector[i];
+		if ( gs.goldSprite  &&
+						mSprite->getBoundingBox().intersectsRect(	gs.goldSprite->getBoundingBox()	) ) 
+		{
+			//播放金币碰撞的粒子效果
+			auto pos = gs.goldSprite->getPosition();//此处默认锚点为精灵中心点
+			auto mParticle = ParticleSystemQuad::create("images/goldParticle.plist");
+			mParticle->setPosition(pos);
+			mParticle->setAutoRemoveOnFinish(true);//粒子播放完，释放内存；不然随着播放累加，内存占用越来越多
+			getGameMap()->addChild(mParticle,PARTICLE_TAG);
+
+			Dlog::showLog("intersecting with gold");
+			gs.goldSprite->removeFromParentAndCleanup(true);
+
+			goldVector.erase(goldVector.begin()+i);	
+
+		}
 	}
 }
 

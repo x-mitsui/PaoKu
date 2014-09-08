@@ -47,6 +47,7 @@ bool GameFatherLayer::init()
 	
 	initRole();
 
+	initComponents();
 	
 	return true;
 }
@@ -65,7 +66,6 @@ void GameFatherLayer::initMap()
 
 	this->addChild(m_TileMap,1);
 
-	initComponents();
 }
 
 void GameFatherLayer::initRole()
@@ -78,6 +78,8 @@ void GameFatherLayer::initRole()
 
 void GameFatherLayer::initComponents()
 {
+	std::vector<goldStruct> goldVector;
+
 	auto goldGroup = m_TileMap->getObjectGroup("items");
 	for (auto &obj : goldGroup->getObjects())
 	{
@@ -86,9 +88,14 @@ void GameFatherLayer::initComponents()
 		float y = dict["y"].asFloat();
 		auto gold = Sprite::create("images/gold.png");
 		gold->setPosition(x,y);
-		m_TileMap->addChild(gold,1000);//此处添加到地图中
+		m_TileMap->addChild(gold,GOLD_TAG);//此处添加到地图中
+		goldStruct _gs;
+		_gs.goldSprite = gold;
+		//以后根据配置文件或者plist文件来加载不同的金币数目
+		_gs.goldValue = 100;
+		goldVector.push_back(_gs);
 	}
-
+	mRole->setGoldVector(goldVector);
 }
 
 void GameFatherLayer::menuCloseCallback(Ref* pSender)

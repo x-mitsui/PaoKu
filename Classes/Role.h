@@ -2,8 +2,8 @@
 #define Role_h__
 
 #include "cocos2d.h"
-
-#define ROLE_ZORDER 10
+#include "mHeaders.h"
+const int ROLE_ZORDER = 10;
 
 enum class ROLE_STATE{
 	ROLE_INVALID_STATE = 0,
@@ -28,6 +28,9 @@ class Role :public cocos2d::Node
 public:
 	Role();
 	~Role();
+	
+	//cocos2d::ParticleSystem particleSystem;//粒子系统
+
 	virtual bool init();  
 	void extraInit();
 	static Role*createWithTMX(cocos2d::TMXTiledMap* _map);
@@ -39,8 +42,13 @@ public:
 	CC_SYNTHESIZE(float, ySpeed, Yspeed);
 	CC_SYNTHESIZE(float, constxSpeed, ConstXspeed);//为了恢复原速度而用
 	CC_SYNTHESIZE(float, constySpeed, ConstYspeed);
+	CC_SYNTHESIZE(std::vector<goldStruct>,goldVector,GoldVector); //创建一个金币的vector
 	void role_update(float dt);
 	void role_logic();
+
+	virtual void onEnter();
+
+	void collsitionWithGold(float delta);
 private:
 	void runLogic();
 	void jumpUpLogic();

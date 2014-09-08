@@ -3,8 +3,10 @@
 
 #include "cocos2d.h"
 #include "Role.h"
+#include "mHeaders.h"
+const int mROLE_TAG = 2;
 
-#define mROLE_TAG 2
+
 class GameFatherLayer : cocos2d::Layer
 {
 public:
